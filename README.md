@@ -1,2 +1,3 @@
 # Flutter-Trials
-Learning Flutter
+Learning Flutter <br>
+Master branch has test and trial codes
