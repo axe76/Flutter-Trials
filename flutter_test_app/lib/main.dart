@@ -7,8 +7,26 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+
+  void answerQuestion(){
+    print('Answer chosen');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: Text('Hello!')); //returns an object of widget class and calls its constructor with a Text widget 
+    var questions = ['What\'s your favourite colour?','What\'s your favourite animal?'];
+    return MaterialApp(home: Scaffold(
+      appBar: AppBar(title: Text('My first app'),),
+      body: Column(children: <Widget>[
+        Text('The question!'),
+        RaisedButton(child: Text('Answer 1'),onPressed: answerQuestion,),
+        RaisedButton(child: Text('Answer 2'),onPressed: () => print('Anser 2 chosen')),
+        RaisedButton(child: Text('Answer 3'),onPressed: (){
+          //...
+          print('Answer 3 chosen');
+        },),
+      ],), //Now this takes in a list of widgets to be rendered in a column
+      )
+    ); 
   }
 }
