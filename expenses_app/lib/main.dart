@@ -31,7 +31,7 @@ class MyHomePage extends StatelessWidget {
             width: double.infinity,
             child: Card(
               color: Colors.blue,
-              child: Text("CHART"),
+              child: Text("CHART",style: TextStyle(color: Colors.white),),
               elevation: 5,),
           ),
           Card(child: Text("List of TX"),)
