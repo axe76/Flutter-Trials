@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class NewTransaction extends StatefulWidget {
   final Function addTx;
@@ -14,20 +15,43 @@ class _NewTransactionState extends State<NewTransaction> {
 
   final amountController = TextEditingController();
 
+  DateTime _selectedDate;
+
   void submitData() {
+    if(amountController.text.isEmpty){
+      return;
+    }
+
     final enteredTitle = titleController.text;
     final enteredAmount = double.parse(amountController.text);
 
-    if (enteredTitle.isEmpty || enteredAmount <= 0) {
+    if (enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null) {
       return;
     }
 
     widget.addTx(
       enteredTitle,
       enteredAmount,
+      _selectedDate
     );
 
     Navigator.of(context).pop();
+  }
+
+  void _selectDate(){
+    showDatePicker(
+      context: context, 
+      initialDate: DateTime.now(), 
+      firstDate: DateTime(2021), 
+      lastDate: DateTime.now()).then((pickedDate){//then waits for a data to be picked i.e., returned by this
+        if (pickedDate == null){
+          return;
+        }
+        setState(() {
+          _selectedDate = pickedDate;
+        });
+        
+      });
   }
 
   @override
@@ -57,10 +81,12 @@ class _NewTransactionState extends State<NewTransaction> {
             Container(
               height: 80,
               child: Row(children: [
-                Text("Today",style: TextStyle(fontSize: 17)),
+                Expanded(child: Text(
+                  _selectedDate == null ?"No date picked":"Date Picked: ${DateFormat.yMMMd().format(_selectedDate)}",
+                  style: TextStyle(fontSize: 17))),
                 FlatButton(
                   textColor: Theme.of(context).primaryColor,
-                  onPressed: (){}, 
+                  onPressed: _selectDate, 
                   child: Text('Choose Different Date',
                   style: TextStyle(fontWeight: FontWeight.bold),))
               ],),
