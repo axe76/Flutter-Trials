@@ -1,35 +1,60 @@
 import 'package:flutter/material.dart';
 
+import '../models/meal.dart';
 import '../dummy_data.dart';
 import '../widgets/meal_item.dart';
 
-class CategoryMeals extends StatelessWidget {
+class CategoryMeals extends StatefulWidget {
 
   static const routeName = 'category-meals';
 
   @override
-  Widget build(BuildContext context) {
+  _CategoryMealsState createState() => _CategoryMealsState();
+}
+
+class _CategoryMealsState extends State<CategoryMeals> {
+  String categoryTitle;
+  List<Meal> displayMeals;
+  var isInitialised = false;
+
+  @override
+  void didChangeDependencies() {//runs every time anything in the state changed. Runs multiple times after initialization
+    if(!isInitialised){
+      final routeArgs = ModalRoute.of(context).settings.arguments as Map<String,String>;
+      categoryTitle = routeArgs['title']; 
+      final String catId = routeArgs['id'];
+
+      displayMeals = DUMMY_MEALS.where((meal) {
+        return meal.categories.contains(catId);
+      }).toList();
+    }
     
-    final routeArgs = ModalRoute.of(context).settings.arguments as Map<String,String>;
-    final String catTitle = routeArgs['title']; 
-    final String catId = routeArgs['id'];
 
-    final catMeals = DUMMY_MEALS.where((meal) {
-      return meal.categories.contains(catId);
-    }).toList();
+    isInitialised = true;
+    super.didChangeDependencies();
+  }
 
+  void removeMeal(String mealId){
+    setState(() {
+      displayMeals.removeWhere((meal) => meal.id == mealId);
+    });
+    
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(catTitle)),
+      appBar: AppBar(title: Text(categoryTitle)),
       body: ListView.builder(itemBuilder: (ctx,index){
         return MealItem(
-          id: catMeals[index].id,
-          title: catMeals[index].title, 
-          affordability: catMeals[index].affordability, 
-          imgUrl: catMeals[index].imageUrl, 
-          complexity: catMeals[index].complexity, 
-          duration: catMeals[index].duration);
-      },itemCount: catMeals.length,)
+          id: displayMeals[index].id,
+          title: displayMeals[index].title, 
+          affordability: displayMeals[index].affordability, 
+          imgUrl: displayMeals[index].imageUrl, 
+          complexity: displayMeals[index].complexity, 
+          duration: displayMeals[index].duration,
+          removeItem: removeMeal,);
+      },itemCount: displayMeals.length,)
     );
   }
 }

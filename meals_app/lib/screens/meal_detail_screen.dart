@@ -9,10 +9,10 @@ class MealDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final String id = ModalRoute.of(context).settings.arguments as String;
+    final String mealId = ModalRoute.of(context).settings.arguments as String;
 
     final selectedMeal = DUMMY_MEALS.firstWhere((meal) {
-      return meal.id == id;
+      return meal.id == mealId;
     });
 
     Widget buildSectiontitle(String text){
@@ -86,7 +86,13 @@ class MealDetail extends StatelessWidget {
             )
           ]
         ),
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.delete),
+        onPressed: (){
+          Navigator.of(context).pop(mealId);//sends mealId to point in code where this screen was pushed
+        },
+        ),
     );
   }
 }
