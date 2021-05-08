@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './dummy_data.dart';
+import './models/meal.dart';
 import './screens/filters_screen.dart';
 import './screens/tabs_screen.dart';
 import './screens/meal_detail_screen.dart';
@@ -10,7 +12,63 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Map<String,bool> _filters = {
+    'glutenFree':false,
+    'lactoseFree':false,
+    'vegetarian':false,
+    'vegan':false
+  };
+
+  List<Meal> _availableMeals = DUMMY_MEALS;
+  List<Meal> _favouriteMeals = [];
+
+  void _setFilters(Map<String,bool> newFilters){
+    setState(() {
+      _filters = newFilters;
+
+      _availableMeals = DUMMY_MEALS.where(
+        (meal) {
+          if(_filters['glutenFree'] && !meal.isGlutenFree){
+            return false;
+          }
+          if(_filters['lactoseFree'] && !meal.isLactoseFree){
+            return false;
+          }
+          if(_filters['vegetarian'] && !meal.isVegetarian){
+            return false;
+          }
+          if(_filters['vegan'] && !meal.isVegan){
+            return false;
+          }
+          return true;
+        }
+        ).toList();
+    });
+  }
+
+  void _toggleFavourite(String mealId){
+    final existingIndex = _favouriteMeals.indexWhere((meal) => meal.id==mealId);
+    if(existingIndex>=0){
+      setState(() {
+        _favouriteMeals.removeAt(existingIndex);
+      });
+    }else{
+      setState(() {
+        _favouriteMeals.add(DUMMY_MEALS.firstWhere((meal) => meal.id==mealId));
+      });
+    }
+  }
+
+  bool _isMealFavourite(String mealId){
+    return _favouriteMeals.any((meal) => meal.id == mealId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,16 +95,16 @@ class MyApp extends StatelessWidget {
       ),
       //home: TabsScreen(),
       routes: {
-        '/': (ctx) => TabsScreen(),//default home
-        CategoryMeals.routeName: (ctx) => CategoryMeals(),
-        MealDetail.routeName: (ctx) => MealDetail(),
-        FiltersScreen.routeName: (ctx)=>FiltersScreen(),
+        '/': (ctx) => TabsScreen(_favouriteMeals),//default home
+        CategoryMeals.routeName: (ctx) => CategoryMeals(_availableMeals),
+        MealDetail.routeName: (ctx) => MealDetail(_isMealFavourite,_toggleFavourite),
+        FiltersScreen.routeName: (ctx)=>FiltersScreen(_filters,_setFilters),
       },
       onGenerateRoute: (settings){//in case a route that hasnt been registered is accessed
-        return MaterialPageRoute(builder: (ctx)=>CategoryMeals());
+        return MaterialPageRoute(builder: (ctx)=>CategoryMeals(_availableMeals));
       },
       onUnknownRoute: (settings){//LAST CASE SCENARIO IF FLUTTER doesnt have a page to build
-        return MaterialPageRoute(builder: (ctx)=>CategoryMeals());
+        return MaterialPageRoute(builder: (ctx)=>CategoryMeals(_availableMeals));
       },
     );
   }

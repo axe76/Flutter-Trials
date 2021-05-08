@@ -8,6 +8,10 @@ class CategoryMeals extends StatefulWidget {
 
   static const routeName = 'category-meals';
 
+  final List<Meal> availableMeals;
+
+  CategoryMeals(this.availableMeals);
+
   @override
   _CategoryMealsState createState() => _CategoryMealsState();
 }
@@ -24,7 +28,7 @@ class _CategoryMealsState extends State<CategoryMeals> {
       categoryTitle = routeArgs['title']; 
       final String catId = routeArgs['id'];
 
-      displayMeals = DUMMY_MEALS.where((meal) {
+      displayMeals = widget.availableMeals.where((meal) {
         return meal.categories.contains(catId);
       }).toList();
     }
@@ -53,7 +57,7 @@ class _CategoryMealsState extends State<CategoryMeals> {
           imgUrl: displayMeals[index].imageUrl, 
           complexity: displayMeals[index].complexity, 
           duration: displayMeals[index].duration,
-          removeItem: removeMeal,);
+          );
       },itemCount: displayMeals.length,)
     );
   }

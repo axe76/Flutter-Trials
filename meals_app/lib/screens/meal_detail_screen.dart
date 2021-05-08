@@ -5,6 +5,12 @@ import '../models/meal.dart';
 class MealDetail extends StatelessWidget {
   static const routeName = '/meal-detail';
 
+  final Function toggleFav;
+  final Function isfavourite;
+
+
+  MealDetail(this.isfavourite,this.toggleFav);
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,10 +94,10 @@ class MealDetail extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.delete),
-        onPressed: (){
-          Navigator.of(context).pop(mealId);//sends mealId to point in code where this screen was pushed
-        },
+        child: Icon(
+          isfavourite(mealId)? Icons.star: Icons.star_border
+          ),
+        onPressed: () => toggleFav(mealId),
         ),
     );
   }

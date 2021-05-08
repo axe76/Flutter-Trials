@@ -10,7 +10,6 @@ class MealItem extends StatelessWidget {
   final int duration;
   final Complexity complexity;
   final Affordability affordability;
-  final Function removeItem;
 
   String get complexityText{
     switch(complexity){
@@ -50,8 +49,7 @@ class MealItem extends StatelessWidget {
     @required this.affordability,
     @required this.imgUrl,
     @required this.complexity,
-    @required this.duration,
-    @required this.removeItem});
+    @required this.duration,});
   
   void selectMeal(BuildContext ctx){
     Navigator.of(ctx).pushNamed(
@@ -59,7 +57,7 @@ class MealItem extends StatelessWidget {
       arguments: id
       ).then((id){
         if(id!=null){
-          removeItem(id);
+          //removeItem(id);
         }
       });
     //then here recieves data from whenever we navigate back from the pushed page in the app 
