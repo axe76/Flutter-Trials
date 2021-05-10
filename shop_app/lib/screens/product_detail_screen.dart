@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/products_provider.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   // final String title;
@@ -11,10 +14,13 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productId = ModalRoute.of(context).settings.arguments as String;
-
+    final loadedProduct = Provider.of<ProductsProvider>(
+      context,
+      listen: false //Here because this is details screen, we dont want to rebuild every time the data in Provider changes.
+      ).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(title: Text('title and ${productId}'),),
+      appBar: AppBar(title: Text('${loadedProduct.title} and ${productId}'),),
     );
   }
 }
