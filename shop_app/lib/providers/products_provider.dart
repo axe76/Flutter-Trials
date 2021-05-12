@@ -42,6 +42,10 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     return [..._items]; //returning a duplicate of _items, not pointer at original list
   }
 
+  List<Product> get favouriteItems{
+    return _items.where((item) => item.isFavourite).toList();
+  }
+
   Product findById(String id){
     return _items.firstWhere((item) => item.id == id);
   }
