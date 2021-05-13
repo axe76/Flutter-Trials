@@ -21,6 +21,14 @@ class ProductDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text('${loadedProduct.title} and ${productId}'),),
+      body: Container(
+        height: 300,
+        width: double.infinity,
+        child: Image.network(
+          loadedProduct.imageUrl,
+          fit: BoxFit.cover,
+          ),
+      ),
     );
   }
 }
