@@ -32,6 +32,23 @@ class CartItemTile extends StatelessWidget {
           ),
         ),//The colour of the rest of the pannel while swiping
       direction: DismissDirection.endToStart,
+      confirmDismiss: (direction){
+        return showDialog(context: context, builder: (ctx){//showDialog returns a future boolean on being popped from the screen
+          return AlertDialog(
+            title: Text('Are You Sure?'),
+            content: Text('Do you want to delete the item from the cart?'),
+            actions: [
+              FlatButton(child: Text('No'),onPressed: (){
+                Navigator.of(context).pop(false);
+              },),
+              FlatButton(child: Text('Yes'),onPressed: (){
+                Navigator.of(context).pop(true);
+              },),
+
+            ],
+          );
+        });
+      },
       onDismissed: (direction){
         Provider.of<Cart>(context,listen: false).removeItem(prodId);
       },
