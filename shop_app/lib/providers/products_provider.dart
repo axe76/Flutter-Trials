@@ -50,7 +50,30 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     return _items.firstWhere((item) => item.id == id);
   }
 
-  void addProduct(){
+  void addProduct(Product product){
+    final newProduct = Product(
+      id: DateTime.now().toString(), 
+      description: product.description, 
+      title: product.title, 
+      price: product.price, 
+      imageUrl: product.imageUrl);
+    _items.add(newProduct);
+    notifyListeners();
+  }
+
+  void updateProduct(String prodId, Product editedProduct){
+    final currProductIndex = _items.indexWhere((product) => product.id == prodId);
+    if(currProductIndex>=0){
+      _items[currProductIndex] = editedProduct;
+      notifyListeners();
+    }else{
+      print('No existing product');
+    }
+    
+  }
+
+  void deleteProduct(String id){
+    _items.removeWhere((product) => product.id == id);
     notifyListeners();
   }
 
