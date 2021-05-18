@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
@@ -50,15 +53,32 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     return _items.firstWhere((item) => item.id == id);
   }
 
-  void addProduct(Product product){
-    final newProduct = Product(
-      id: DateTime.now().toString(), 
+  Future<void> addProduct(Product product){ //to return a Future that doesnt pass any data back to then. This is done for loading screen
+    //http post:
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json');//firebase
+    return http.post(url, body: json.encode({
+      'title':product.title,
+      'description': product.description,
+      'imageUrl':product.imageUrl,
+      'price': product.price,
+      'isFavourite': product.isFavourite
+    })).then((response) {//here we wait for http request followed by response from server instead of immediately executing next line
+    //as we want to use data from response
+      //local storage logic
+      final newProduct = Product(
+      id: json.decode(response.body)['name'], 
       description: product.description, 
       title: product.title, 
       price: product.price, 
-      imageUrl: product.imageUrl);
-    _items.add(newProduct);
-    notifyListeners();
+      imageUrl: product.imageUrl
+      );
+      _items.add(newProduct);
+      print(newProduct.id);
+      notifyListeners();
+    }).catchError((error){
+      print(error);
+      throw error; //throws it to object catching error from this method, i.e. in editing screen  
+    });// here then also returns a future. Hence we return this full statement
   }
 
   void updateProduct(String prodId, Product editedProduct){

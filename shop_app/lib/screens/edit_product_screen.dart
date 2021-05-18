@@ -40,6 +40,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   var _isInit = true;
+  var _isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -86,14 +87,39 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
 
     if(_editedProduct.id !=null){//i.e. we have recieved id as argument in did change dep, i.e. we are editing and not adding a prod
       Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct.id, _editedProduct);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     }else{
-      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct);
+      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct)
+      .catchError((error){//catching error thrown by this method
+        return showDialog(context: context, builder: (ctx)=>//here showDialog also returns a future
+          AlertDialog(
+            title: Text('An error Occured!'),
+            content: Text('Something went wrong'),
+            actions: [
+              FlatButton(child: Text('Ok'),onPressed: (){
+                Navigator.of(ctx).pop();
+              }, )
+            ],
+          )
+        );
+      }).then((_){//For loading screen. Here even though
+      //the future returned is of type void, we have to define a parametric function
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
+      });
     }
 
-    Navigator.of(context).pop();
     // print(_editedProduct.title);
     // print(_editedProduct.description);
     // print(_editedProduct.price);
@@ -111,7 +137,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
         )
       ],
       ),
-      body: Padding(
+      body: _isLoading? Center(
+        child: CircularProgressIndicator(),
+      )
+      : Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _form,
