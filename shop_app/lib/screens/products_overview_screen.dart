@@ -6,7 +6,7 @@ import '../widgets/badge.dart';
 import '../screens/cart_screen.dart';
 import '../providers/cart.dart';
 import '../widgets/products_grid.dart';
-import '../widgets/product_item.dart';
+import '../providers/products_provider.dart';
 
 enum FilterOptions{
   Favourites,
@@ -21,6 +21,31 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _isFavourites = false;
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void initState() {// we cannot use of.context stuff in initstate because the widgets havent been fully built when this method is called
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if(_isInit){
+      setState(() {
+        _isLoading = true;  
+      });
+      Provider.of<ProductsProvider>(context).fetchAndSetProduct().then((value){
+        setState(() {
+          _isLoading = false;
+
+        });
+      });
+    }
+    _isInit = false;
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +84,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         ],
         ),
         drawer: AppDrawer(),
-      body: ProductsGrid(_isFavourites),
+      body: _isLoading? Center(
+        child: CircularProgressIndicator() 
+      ) : ProductsGrid(_isFavourites),
     );
   }
 }

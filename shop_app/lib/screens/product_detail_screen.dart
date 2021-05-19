@@ -20,7 +20,7 @@ class ProductDetailScreen extends StatelessWidget {
       ).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(title: Text('${loadedProduct.title} and ${productId}'),),
+      appBar: AppBar(title: Text('${loadedProduct.title}'),),
       body: SingleChildScrollView(
               child: Column(
           children: [

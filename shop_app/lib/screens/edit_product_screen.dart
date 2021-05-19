@@ -81,7 +81,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm(){
+  Future<void> _saveForm() async{
     final isValid = _form.currentState.validate(); //calls all validators and returns false if even one fails
     if(!isValid){
       return;
@@ -92,15 +92,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
 
     if(_editedProduct.id !=null){//i.e. we have recieved id as argument in did change dep, i.e. we are editing and not adding a prod
-      Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct.id, _editedProduct);
-      setState(() {
-        _isLoading = false;
-      });
-      Navigator.of(context).pop();
+      await Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct.id, _editedProduct);
+      // setState(() {
+      //   _isLoading = false;
+      // });
+      // Navigator.of(context).pop();
     }else{
-      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct)
-      .catchError((error){//catching error thrown by this method
-        return showDialog(context: context, builder: (ctx)=>//here showDialog also returns a future
+      try{
+        await Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct);
+      }catch(error){
+        await showDialog(context: context, builder: (ctx)=>//here showDialog also returns a future
           AlertDialog(
             title: Text('An error Occured!'),
             content: Text('Something went wrong'),
@@ -111,19 +112,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           )
         );
-      }).then((_){//For loading screen. Here even though
-      //the future returned is of type void, we have to define a parametric function
-      setState(() {
+      }
+      // finally{
+      //   setState(() {
+      //   _isLoading = false;
+      //   });
+      //   Navigator.of(context).pop();
+      // }  
+    }
+    setState(() {
         _isLoading = false;
       });
-      Navigator.of(context).pop();
-      });
-    }
-
-    // print(_editedProduct.title);
-    // print(_editedProduct.description);
-    // print(_editedProduct.price);
-    // print(_editedProduct.imageUrl);
+    Navigator.of(context).pop();
 
   }
 
