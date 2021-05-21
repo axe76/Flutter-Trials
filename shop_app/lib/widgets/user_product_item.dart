@@ -13,6 +13,8 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldCOntext = Scaffold.of(context);//we do this here and not directly in the delete catch block as context is changing, 
+    //so when we call it down there app doesnt know which context to look at
     return ListTile(
       leading: CircleAvatar(
         backgroundImage: NetworkImage(imageUrl),//Here the image url is given to a network image provider
@@ -22,11 +24,24 @@ class UserProductItem extends StatelessWidget {
         width: 100,
         child: Row(
           children:[
-            IconButton(icon: Icon(Icons.edit), color: Theme.of(context).primaryColor, onPressed: (){
-              Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
+            IconButton(
+              icon: Icon(Icons.edit), 
+              color: Theme.of(context).primaryColor, 
+              onPressed: (){
+                Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
             },),
-            IconButton(icon: Icon(Icons.delete), color: Theme.of(context).errorColor, onPressed: (){
-              Provider.of<ProductsProvider>(context, listen: false).deleteProduct(id);
+            IconButton(
+              icon: Icon(Icons.delete), 
+              color: Theme.of(context).errorColor, 
+              onPressed: ()async{
+                try{
+                  await Provider.of<ProductsProvider>(context, listen: false).deleteProduct(id);
+                }catch (error){
+                  scaffoldCOntext.showSnackBar(SnackBar(
+                    content: Text('Could not delete item.'),
+                    )
+                  );
+                }
             },),
           ]
         ),

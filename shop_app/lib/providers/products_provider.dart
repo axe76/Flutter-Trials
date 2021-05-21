@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import '../models/http_exceptions.dart';
 
 import 'product.dart';
 
@@ -58,6 +61,9 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     try{
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String,dynamic>;
+      if(extractedData == null){
+        return;
+      }
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {//key,val
         loadedProducts.add(Product(
@@ -131,20 +137,22 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     
   }
 
-  void deleteProduct(String id){
+  Future<void> deleteProduct(String id) async{
     final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json');
     final existingProductIndex = _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];
-    http.delete(url).then(//Here we delete without await to send compiler to next code line for speed of rendering 
-      (value) {//if no error in delete http method, set existing prod to null
-        existingProduct = null;
-      }
-    ).catchError((error){
-      _items.insert(existingProductIndex,existingProduct);
-      notifyListeners();
-    });
     _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    final response = await http.delete(url);
+
+    if(response.statusCode>=400){//i.e. error. For delete method the exception is not caught if we dont specifically throw
+      _items.insert(existingProductIndex,existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete Product.');
+    }
+    existingProduct = null;
+    
   }
 
 }
