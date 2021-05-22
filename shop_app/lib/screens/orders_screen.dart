@@ -34,7 +34,7 @@ class _OrdersScreenState extends State<OrdersScreen> {//note to use initState an
     return Scaffold(
       appBar: AppBar(title: Text('Your Orders'),),
       drawer: AppDrawer(),
-      body: FutureBuilder(
+      body: FutureBuilder(//alternate method for making loading screen and future based screens
         future: _ordersFuture,
         builder: (ctx,dataSnapshot){
           if(dataSnapshot.connectionState == ConnectionState.waiting){
