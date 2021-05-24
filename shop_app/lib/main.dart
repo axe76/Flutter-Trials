@@ -24,19 +24,26 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (ctx)=>ProductsProvider(),
+          create: (ctx)=>Auth()
+        ),
+        ChangeNotifierProxyProvider<Auth, ProductsProvider>(//Proxy provider sets up a provider dependent on another provider defined before it. As ProductsProvider needs authToken arg from Auth()
+          update: (ctx, auth, previousProdProv)=>ProductsProvider(
+            auth.token,
+            previousProdProv == null?[]: previousProdProv.items
+          ),
         ),
         ChangeNotifierProvider(
           create: (ctx)=>Cart(),
         ),
-        ChangeNotifierProvider(
-          create: (ctx)=>Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          update: (ctx,auth,prevOrdersProv)=>Orders(
+            auth.token,
+            prevOrdersProv == null? []:prevOrdersProv.orders
+          ),
         ),
-        ChangeNotifierProvider(
-          create: (ctx)=>Auth()
-        )
+        
       ],
-      child: MaterialApp(
+      child: Consumer<Auth>(builder: (ctx,auth,_)=>MaterialApp(
         title: 'Shop App',
         theme: ThemeData(
           primarySwatch: Colors.purple,
@@ -45,14 +52,14 @@ class MyApp extends StatelessWidget {
         ),
         //home: ProductsOverviewScreen(),
         routes: {
-          '/':(ctx) => AuthScreen(),//ProductsOverviewScreen(),
+          '/':(ctx) => auth.isAuth? ProductsOverviewScreen():AuthScreen(),//ProductsOverviewScreen(),
           ProductDetailScreen.routeName:(ctx) => ProductDetailScreen(),
           CartScreen.routeName: (ctx) => CartScreen(),
           OrdersScreen.routeName: (ctx) => OrdersScreen(),
           UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
           EditProductScreen.routeName: (ctx) => EditProductScreen(),
         },
-      ),
+      ),), 
       );
   }
 }

@@ -24,11 +24,11 @@ class Product with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> toggleFavourite() async{
+  Future<void> toggleFavourite(String token) async{
     final oldStatus = isFavourite;
     isFavourite = !isFavourite;
     notifyListeners(); //kinda like setState but for all listeners. Triggers rebuild of respective listeners
-    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json');
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json?auth=$token');
     try{
       final response = await http.patch(url,body: json.encode({
           'isFavourite':isFavourite,

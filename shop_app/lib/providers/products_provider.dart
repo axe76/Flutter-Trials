@@ -44,6 +44,9 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     // ),
   ];
 
+  final String authToken;
+  ProductsProvider(this.authToken,this._items);
+
   List<Product> get items{
     return [..._items]; //returning a duplicate of _items, not pointer at original list
   }
@@ -57,7 +60,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
   }
 
   Future<void> fetchAndSetProduct() async{//fetches products from server and sets on products overview page
-    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json');
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json?auth=${authToken}');
     try{
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String,dynamic>;
@@ -87,7 +90,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     //async automatically wraps everything into future so we dont have to return a future in the code below
     try{
     //http post:
-      final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json');//firebase
+      final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json?auth=${authToken}');//firebase
       final response = await http.post(url, body: json.encode({ //await makes everything wait for this
         'title':product.title,
         'description': product.description,
@@ -120,7 +123,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
   Future<void> updateProduct(String prodId, Product editedProduct) async{
     final currProductIndex = _items.indexWhere((product) => product.id == prodId);
     if(currProductIndex>=0){
-      final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$prodId.json');
+      final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$prodId.json?auth=${authToken}');
       await http.patch(url,body:json.encode({
         'title':editedProduct.title,
         'description': editedProduct.description,
@@ -138,7 +141,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
   }
 
   Future<void> deleteProduct(String id) async{
-    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json');
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json?auth=${authToken}');
     final existingProductIndex = _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
