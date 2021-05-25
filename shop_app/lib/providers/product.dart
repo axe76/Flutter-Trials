@@ -24,15 +24,14 @@ class Product with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> toggleFavourite(String token) async{
+  Future<void> toggleFavourite(String token, String userId) async{
     final oldStatus = isFavourite;
     isFavourite = !isFavourite;
     notifyListeners(); //kinda like setState but for all listeners. Triggers rebuild of respective listeners
-    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products/$id.json?auth=$token');
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/userFavourites/$userId/$id.json?auth=$token');
     try{
-      final response = await http.patch(url,body: json.encode({
-          'isFavourite':isFavourite,
-          }
+      final response = await http.put(url,body: json.encode(
+          isFavourite
         )
       );
       if(response.statusCode>=400){ //here wehave to do this as http package doesnt throw its own error for patch, put and delete

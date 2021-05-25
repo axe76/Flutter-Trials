@@ -29,6 +29,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, ProductsProvider>(//Proxy provider sets up a provider dependent on another provider defined before it. As ProductsProvider needs authToken arg from Auth()
           update: (ctx, auth, previousProdProv)=>ProductsProvider(
             auth.token,
+            auth.userId,
             previousProdProv == null?[]: previousProdProv.items
           ),
         ),

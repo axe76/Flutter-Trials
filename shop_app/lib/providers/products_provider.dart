@@ -45,7 +45,8 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
   ];
 
   final String authToken;
-  ProductsProvider(this.authToken,this._items);
+  final String userId;
+  ProductsProvider(this.authToken,this.userId,this._items);
 
   List<Product> get items{
     return [..._items]; //returning a duplicate of _items, not pointer at original list
@@ -59,14 +60,18 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
     return _items.firstWhere((item) => item.id == id);
   }
 
-  Future<void> fetchAndSetProduct() async{//fetches products from server and sets on products overview page
-    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json?auth=${authToken}');
+  Future<void> fetchAndSetProduct([bool filterByUserId = false]) async{//fetches products from server and sets on products overview page
+    final filterString = filterByUserId? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    final url = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/products.json?auth=${authToken}&$filterString');//return only with userIds equal to this userId 
     try{
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String,dynamic>;
       if(extractedData == null){
         return;
       }
+      final favouritesUrl = Uri.parse('https://flutter-shop-app-b8243-default-rtdb.firebaseio.com/userFavourites/$userId.json?auth=$authToken');
+      final favResponse = await http.get(favouritesUrl);
+      final favData = json.decode(favResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {//key,val
         loadedProducts.add(Product(
@@ -74,7 +79,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
           title: prodData['title'],
           description: prodData['description'],
           price: prodData['price'],
-          isFavourite: prodData['isFavourite'],
+          isFavourite: favData == null? false:favData[prodId] ?? false, //if favData is null, i.e. this user hasnt faved any items, give false. If this user hasnt faved this prodId then also false hence the ??
           imageUrl: prodData['imageUrl']
         ));
       }
@@ -96,7 +101,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
         'description': product.description,
         'imageUrl':product.imageUrl,
         'price': product.price,
-        'isFavourite': product.isFavourite
+        'creatorId':userId,
       }));
       //here we wait for http request followed by response from server instead of immediately executing next line
       //as we want to use data from response
