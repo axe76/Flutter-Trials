@@ -53,7 +53,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
   }
 
   List<Product> get favouriteItems{
-    return _items.where((item) => item.isFavourite).toList();
+    return _items.where((item) => item.isFavorite).toList();
   }
 
   Product findById(String id){
@@ -79,7 +79,7 @@ class ProductsProvider with ChangeNotifier { //mixin i.e. like inheritance light
           title: prodData['title'],
           description: prodData['description'],
           price: prodData['price'],
-          isFavourite: favData == null? false:favData[prodId] ?? false, //if favData is null, i.e. this user hasnt faved any items, give false. If this user hasnt faved this prodId then also false hence the ??
+          isFavorite: favData == null? false:favData[prodId] ?? false, //if favData is null, i.e. this user hasnt faved any items, give false. If this user hasnt faved this prodId then also false hence the ??
           imageUrl: prodData['imageUrl']
         ));
       }

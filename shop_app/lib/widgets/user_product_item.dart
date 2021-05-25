@@ -2,48 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/edit_product_screen.dart';
-import '../providers/products_provider.dart';
+import '../providers/products.dart';
 
 class UserProductItem extends StatelessWidget {
   final String id;
   final String title;
   final String imageUrl;
 
-  UserProductItem(this.id, this.title,this.imageUrl);
+  UserProductItem(this.id, this.title, this.imageUrl);
 
   @override
   Widget build(BuildContext context) {
-    final scaffoldCOntext = Scaffold.of(context);//we do this here and not directly in the delete catch block as context is changing, 
-    //so when we call it down there app doesnt know which context to look at
+    final scaffold = Scaffold.of(context);
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(imageUrl),//Here the image url is given to a network image provider
-      ),
       title: Text(title),
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(imageUrl),
+      ),
       trailing: Container(
         width: 100,
         child: Row(
-          children:[
+          children: <Widget>[
             IconButton(
-              icon: Icon(Icons.edit), 
-              color: Theme.of(context).primaryColor, 
-              onPressed: (){
-                Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: id);
-            },),
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(EditProductScreen.routeName, arguments: id);
+              },
+              color: Theme.of(context).primaryColor,
+            ),
             IconButton(
-              icon: Icon(Icons.delete), 
-              color: Theme.of(context).errorColor, 
-              onPressed: ()async{
-                try{
-                  await Provider.of<ProductsProvider>(context, listen: false).deleteProduct(id);
-                }catch (error){
-                  scaffoldCOntext.showSnackBar(SnackBar(
-                    content: Text('Could not delete item.'),
-                    )
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                try {
+                  await Provider.of<Products>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (error) {
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text('Deleting failed!', textAlign: TextAlign.center,),
+                    ),
                   );
                 }
-            },),
-          ]
+              },
+              color: Theme.of(context).errorColor,
+            ),
+          ],
         ),
       ),
     );

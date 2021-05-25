@@ -1,19 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'dart:math';
 
-import '../providers/orders.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class OrderItemTile extends StatefulWidget {
-  final OrderItem order;
+import '../providers/orders.dart' as ord;
 
-  OrderItemTile(this.order);
+class OrderItem extends StatefulWidget {
+  final ord.OrderItem order;
+
+  OrderItem(this.order);
 
   @override
-  _OrderItemTileState createState() => _OrderItemTileState();
+  _OrderItemState createState() => _OrderItemState();
 }
 
-class _OrderItemTileState extends State<OrderItemTile> {
+class _OrderItemState extends State<OrderItem> {
   var _expanded = false;
 
   @override
@@ -21,49 +22,52 @@ class _OrderItemTileState extends State<OrderItemTile> {
     return Card(
       margin: EdgeInsets.all(10),
       child: Column(
-        children: [
+        children: <Widget>[
           ListTile(
             title: Text('\$${widget.order.amount}'),
-            subtitle: Text(DateFormat.yMMMd().format(widget.order.dateTime)),
+            subtitle: Text(
+              DateFormat('dd/MM/yyyy hh:mm').format(widget.order.dateTime),
+            ),
             trailing: IconButton(
-              icon: Icon(_expanded? Icons.expand_less:Icons.expand_more),
-              onPressed: (){
+              icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+              onPressed: () {
                 setState(() {
                   _expanded = !_expanded;
                 });
               },
             ),
           ),
-          if(_expanded) Container(
-            padding: EdgeInsets.symmetric(vertical: 6,horizontal: 15),
-            height: min(widget.order.products.length * 20.0 + 16.0, 100),
-            child: ListView.builder(
-              itemCount: widget.order.products.length,
-              itemBuilder: (ctx,i){
-                var pdt = widget.order.products[i];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      pdt.title,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold
-                      ),
-                    ),
-                    Text(
-                      '${pdt.quantity} x \$${pdt.price}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
+          if (_expanded)
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+              height: min(widget.order.products.length * 20.0 + 10, 100),
+              child: ListView(
+                children: widget.order.products
+                    .map(
+                      (prod) => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                prod.title,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${prod.quantity}x \$${prod.price}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            ],
+                          ),
                     )
-                  ],
-                );
-              }
+                    .toList(),
               ),
-          )
-        ]
+            )
+        ],
       ),
     );
   }

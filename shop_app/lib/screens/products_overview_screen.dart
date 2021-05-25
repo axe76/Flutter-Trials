@@ -2,48 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/app_drawer.dart';
-import '../widgets/badge.dart';
-import '../screens/cart_screen.dart';
-import '../providers/cart.dart';
 import '../widgets/products_grid.dart';
-import '../providers/products_provider.dart';
+import '../widgets/badge.dart';
+import '../providers/cart.dart';
+import './cart_screen.dart';
+import '../providers/products.dart';
 
-enum FilterOptions{
-  Favourites,
-  All
+enum FilterOptions {
+  Favorites,
+  All,
 }
 
 class ProductsOverviewScreen extends StatefulWidget {
-
   @override
   _ProductsOverviewScreenState createState() => _ProductsOverviewScreenState();
 }
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
-  var _isFavourites = false;
+  var _showOnlyFavorites = false;
   var _isInit = true;
   var _isLoading = false;
 
   @override
-  void initState() {// we cannot use of.context stuff in initstate because the widgets havent been fully built when this method is called
+  void initState() {
+    // Provider.of<Products>(context).fetchAndSetProducts(); // WON'T WORK!
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<Products>(context).fetchAndSetProducts();
+    // });
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
-    if(_isInit){
+    if (_isInit) {
       setState(() {
-        _isLoading = true;  
+        _isLoading = true;
       });
-      Provider.of<ProductsProvider>(context).fetchAndSetProduct().then((value){
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
         setState(() {
           _isLoading = false;
-
         });
       });
     }
     _isInit = false;
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
 
@@ -52,42 +53,53 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('MyShop'),
-        actions: [
-          PopupMenuButton(icon: Icon(Icons.more_vert) ,itemBuilder: (_){
-            return [
-              PopupMenuItem(child: Text('Only favourites'),value:FilterOptions.Favourites),
-              PopupMenuItem(child: Text('All'), value:FilterOptions.All)
-            ];
-          },
-          onSelected: (FilterOptions selectedValue){
-            setState(() {
-              if(selectedValue == FilterOptions.Favourites){
-                _isFavourites = true;
-              }else{
-                _isFavourites = false;
-              }
-            });
-          },
+        actions: <Widget>[
+          PopupMenuButton(
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.Favorites) {
+                  _showOnlyFavorites = true;
+                } else {
+                  _showOnlyFavorites = false;
+                }
+              });
+            },
+            icon: Icon(
+              Icons.more_vert,
+            ),
+            itemBuilder: (_) => [
+                  PopupMenuItem(
+                    child: Text('Only Favorites'),
+                    value: FilterOptions.Favorites,
+                  ),
+                  PopupMenuItem(
+                    child: Text('Show All'),
+                    value: FilterOptions.All,
+                  ),
+                ],
           ),
           Consumer<Cart>(
+            builder: (_, cart, ch) => Badge(
+                  child: ch,
+                  value: cart.itemCount.toString(),
+                ),
             child: IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: (){
+              icon: Icon(
+                Icons.shopping_cart,
+              ),
+              onPressed: () {
                 Navigator.of(context).pushNamed(CartScreen.routeName);
-              },),
-            builder: (ctx,cart,child){
-              return Badge(
-            child: child, 
-            value: cart.itemCount.toString());
-            }
+              },
+            ),
           ),
         ],
-        ),
-        drawer: AppDrawer(),
-      body: _isLoading? Center(
-        child: CircularProgressIndicator() 
-      ) : ProductsGrid(_isFavourites),
+      ),
+      drawer: AppDrawer(),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }
-

@@ -3,54 +3,67 @@ import 'package:provider/provider.dart';
 
 import '../providers/cart.dart';
 
-class CartItemTile extends StatelessWidget {
+class CartItem extends StatelessWidget {
   final String id;
-  final String prodId;
+  final String productId;
   final double price;
   final int quantity;
   final String title;
 
-  CartItemTile(this.id,this.prodId,this.price,this.quantity,this.title);
-
+  CartItem(
+    this.id,
+    this.productId,
+    this.price,
+    this.quantity,
+    this.title,
+  );
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey(id), //Simply assigining a unique key to each item so that issues in rendering a list dont happen
+      key: ValueKey(id),
       background: Container(
         color: Theme.of(context).errorColor,
         child: Icon(
           Icons.delete,
           color: Colors.white,
           size: 40,
-          ),
-          alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: 10),
-          margin: EdgeInsets.symmetric(
+        ),
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20),
+        margin: EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 4,
-          ),
-        ),//The colour of the rest of the pannel while swiping
+        ),
+      ),
       direction: DismissDirection.endToStart,
-      confirmDismiss: (direction){
-        return showDialog(context: context, builder: (ctx){//showDialog returns a future boolean on being popped from the screen
-          return AlertDialog(
-            title: Text('Are You Sure?'),
-            content: Text('Do you want to delete the item from the cart?'),
-            actions: [
-              FlatButton(child: Text('No'),onPressed: (){
-                Navigator.of(context).pop(false);
-              },),
-              FlatButton(child: Text('Yes'),onPressed: (){
-                Navigator.of(context).pop(true);
-              },),
-
-            ],
-          );
-        });
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+                title: Text('Are you sure?'),
+                content: Text(
+                  'Do you want to remove the item from the cart?',
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('No'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(false);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('Yes'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(true);
+                    },
+                  ),
+                ],
+              ),
+        );
       },
-      onDismissed: (direction){
-        Provider.of<Cart>(context,listen: false).removeItem(prodId);
+      onDismissed: (direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       child: Card(
         margin: EdgeInsets.symmetric(
@@ -64,13 +77,13 @@ class CartItemTile extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(5),
                 child: FittedBox(
-                  child: Text('\$${price}')
-                )
+                  child: Text('\$$price'),
+                ),
               ),
             ),
             title: Text(title),
-            subtitle: Text('Total: \$${price*quantity}'),
-            trailing: Text('${quantity} x'),
+            subtitle: Text('Total: \$${(price * quantity)}'),
+            trailing: Text('$quantity x'),
           ),
         ),
       ),
