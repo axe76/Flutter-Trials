@@ -28,10 +28,13 @@ class ProductItem extends StatelessWidget {
               arguments: product.id,
             );
           },
-          child: FadeInImage(
-            placeholder: AssetImage('assets/images/product-placeholder.png'),
-            image: NetworkImage(product.imageUrl),
-            fit: BoxFit.cover,
+          child: Hero(//for hero transition on clicking //Hero widget also used in product detail screen since we are navigating between two pages
+              tag: product.id,//unique tag to identify which image of which widget to animate
+              child: FadeInImage(
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ) 
         ),
         footer: GridTileBar(
