@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import './screens/chat_screen.dart';
+import './screens/auth_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,10 +16,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.pink,
+        backgroundColor: Colors.pink,
+        accentColor: Colors.deepPurple,
+        accentColorBrightness: Brightness.dark,//telling flutter to use light colours for a dark accent color
+        buttonTheme: ButtonTheme.of(context).copyWith(
+          buttonColor: Colors.pink,
+          textTheme: ButtonTextTheme.primary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
+        )
       ),
       routes: {
-        '/':(ctx)=>ChatScreen(),
+        '/':(ctx)=>AuthScreen(),
       },
     );
   }
